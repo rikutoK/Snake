@@ -22,8 +22,7 @@ public class Constants {
     public static final Color SNAKE_BODY_COLOR = new Color(144, 238, 144);
     public static final Color FOOD_COLOR = Color.RED;
 
-
-    public static final int FPS = 60;
+    public static final int DELAY = 70;
 }
 
 enum Direction {
@@ -40,5 +39,20 @@ enum Direction {
 
     public int value() {
         return val;
+    }
+
+    public static Direction getDirection(int val) {
+        switch (val) {
+            case 0:
+                return UP;
+            case 1:
+                return DOWN;
+            case 2:
+                return LEFT;
+            case 3:
+                return RIGHT;
+            default:
+                return null;
+        }
     }
 }
