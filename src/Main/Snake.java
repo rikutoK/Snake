@@ -196,6 +196,16 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
         return running;
     }
 
+    public Direction getCurrDirection() {
+        return currDirection;
+    }
+
+    public void setNextDirection(Direction nextDirection) {
+        this.nextDirection = nextDirection;
+
+        update();
+    }
+
     public int getScore() {
         return score;
     }

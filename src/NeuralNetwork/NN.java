@@ -2,12 +2,15 @@ package NeuralNetwork;
 
 import Main.Constants;
 import Main.Snake;
+import NeuralNetwork.GeneticAlgorithm.Individual;
+import Main.Direction;
+
 
 public class NN {
     public static final int FIRST_LAYER = Constants.GRID_LENGTH * Constants.GRID_WIDTH; //entire game board
     public static final int SECOND_LAYER = 16;
     public static final int THIRD_LAYER = 16;
-    public static final int OUTPUT_LAYER = 3; //left, straight, right
+    public static final int OUTPUT_LAYER = 3; //turn left, straight, right
 
     //neurons
     public double[] first_layer;
@@ -43,13 +46,15 @@ public class NN {
         third_to_output = new double[OUTPUT_LAYER][THIRD_LAYER];
     }
 
-    public int start() {
+    public int play() {
         snake.setRunning(true);
 
         while(snake.isRunning()) {
             getInput();
 
             calcLayers();
+
+            snake.setNextDirection(output());
         }
 
         int score = snake.getScore();
@@ -59,7 +64,7 @@ public class NN {
         return score; //score
     }
 
-    public void getInput() {
+    private void getInput() {
         int[][] grid = snake.generateGrid();
 
         for(int i = 0; i < Constants.GRID_WIDTH; i++) {
@@ -69,7 +74,7 @@ public class NN {
         }
     }
 
-    public void calcLayers() {
+    private void calcLayers() {
         //calculating second layer
         for(int i = 0; i < SECOND_LAYER; i++) {
             second_layer[i] = 0;
@@ -108,11 +113,116 @@ public class NN {
     }
 
     //activation function
-    public void sigmoid(double[] layer) {
+    private void sigmoid(double[] layer) {
         for(int i = 0; i < layer.length; i++) {
             layer[i] = 1/(1 + Math.pow(Math.E, -layer[i])); // 1 / (1 + e^-x)
         }
     }
 
+    private Direction output() {
+        //converting the output to probability
+        double sum = 0;
+        for(int i = 0; i < OUTPUT_LAYER; i++) {
+            sum += output_layer[i];
+        }
 
+        for(int i = 0; i < OUTPUT_LAYER; i++) {
+            output_layer[i] /= sum; 
+        }
+
+
+        int index = -1;
+
+        double probability = Math.random();
+        sum = 0;
+
+        while(probability > sum) {
+            index++;
+            sum += output_layer[index];
+        }
+
+
+        switch (index) {
+            case 0: //left
+                switch (snake.getCurrDirection()) {
+                    case UP:
+                        return Direction.LEFT;
+
+                    case DOWN:
+                        return Direction.RIGHT;
+
+                    case LEFT:
+                        return Direction.DOWN;
+
+                    case RIGHT:
+                        return Direction.UP;
+                }
+
+                break;
+            
+            case 1: //straight
+                return snake.getCurrDirection();
+            
+            case 2: //right
+                switch (snake.getCurrDirection()) {
+                    case UP:
+                        return Direction.RIGHT;
+
+                    case DOWN:
+                        return Direction.LEFT;
+
+                    case LEFT:
+                        return Direction.UP;
+
+                    case RIGHT:
+                        return Direction.RIGHT;
+                }
+                
+                break;
+        }
+
+        return null;
+    }
+
+    public void setWeights(Individual individual) {
+        int index = 0;
+
+        //weights
+        for(int i = 0; i < FIRST_LAYER; i++) {
+            for(int j = 0; j < SECOND_LAYER; j++) {
+                first_to_second[i][j] = individual.get(index);
+                index++;
+            }
+        }
+
+        for(int i = 0; i < SECOND_LAYER; i++) {
+            for(int j = 0; j < THIRD_LAYER; j++) {
+                second_to_third[i][j] = individual.get(index);
+                index++;
+            }
+        }
+
+        for(int i = 0; i < THIRD_LAYER; i++) {
+            for(int j = 0; j < OUTPUT_LAYER; j++) {
+                third_to_output[i][j] = individual.get(index);
+                index++;
+            }
+        }
+
+        //bias
+        for(int i = 0; i < SECOND_LAYER; i++) {
+            second_layer_bias[i] = individual.get(index);
+            index++;
+        }
+
+        for(int i = 0; i < THIRD_LAYER; i++) {
+            third_layer_bias[i] = individual.get(index);
+            index++;
+        }
+
+        for(int i = 0; i < OUTPUT_LAYER; i++) {
+            output_layer_bias[i] = individual.get(index);
+            index++;
+        }
+    }
 }
