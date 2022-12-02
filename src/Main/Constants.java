@@ -56,3 +56,28 @@ enum Direction {
         }
     }
 }
+
+enum Turn {
+    LEFT(-1),
+    STRAIGHT(0),
+    RIGHT(1);
+
+    private int val;
+
+    private Turn(int val) {
+        this.val = val;
+    }
+
+    public static Turn getDirection(int val) {
+        switch (val) {
+            case -1:
+                return LEFT;
+            case 0:
+                return STRAIGHT;
+            case 1:
+                return RIGHT;
+            default:
+                return null;
+        }
+    }
+}

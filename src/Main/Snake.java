@@ -17,11 +17,15 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
     private Direction currDirection; //keep track of which way the snake is going
     private Direction nextDirection; //keep track of legal turns possible
 
+    private boolean playing; //whether the player is playing or not
+
     private Timer timer;
     private boolean running;
 
 
-    public Snake() {
+    public Snake(boolean playing) {
+        this.playing = playing;
+
         initSnake();
         generateFood();
 
@@ -47,11 +51,11 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
 
         drawCircle(food, Constants.FOOD_COLOR, g); //food
 
-        drawSquare(snake.get(0), Constants.SNAKE_HEAD_COLOR, g); //snake head
-
         for(int i = 1; i < snake.size(); i++) { //snake body
             drawSquare(snake.get(i), Constants.SNAKE_BODY_COLOR, g);
         }
+
+        drawSquare(snake.get(0), Constants.SNAKE_HEAD_COLOR, g); //snake head
     }
 
     private void drawSquare(Coordinate c, Color color, Graphics g) {
@@ -154,6 +158,22 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
         timer.start();
     }
 
+    public void update() {
+        if(running) {
+            move(); //moves one square
+
+            if(checkCollision()) {
+                running = false;
+            }
+            if(checkFood()) {
+                snake.add(new Coordinate(snake.get(snake.size() - 1))); //increase snake by 1
+                score++;
+                generateFood();
+            }
+            repaint();
+        }
+    }
+
     public int[][] generateGrid() {
         int[][] grid = new int[Constants.GRID_WIDTH][Constants.GRID_LENGTH];
 
@@ -168,10 +188,31 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
         return grid;
     }
     
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void reset() {
+        initSnake();
+        generateFood();
+    }
     
     @Override
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode()) {
+            case KeyEvent.VK_ENTER: //to start the game if manually played
+                if(playing) {
+                    start();
+                }
+                break;
             case KeyEvent.VK_UP:
                 if(currDirection != Direction.DOWN) {
                     nextDirection = Direction.UP;
@@ -203,18 +244,6 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(running) {
-            move(); //moves one square
-
-            if(checkCollision()) {
-                running = false;
-            }
-            if(checkFood()) {
-                snake.add(new Coordinate(snake.get(snake.size() - 1))); //increase snake by 1
-                generateFood();
-            }
-            repaint();
-        }
-        
+        update();
     }
 }
