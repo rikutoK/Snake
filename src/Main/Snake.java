@@ -8,6 +8,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import Main.Constants.Direction;
+
 public class Snake extends JPanel implements KeyListener, ActionListener {
     private JFrame frame;
 
@@ -17,14 +19,14 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
     private Direction currDirection; //keep track of which way the snake is going
     private Direction nextDirection; //keep track of legal turns possible
 
-    private boolean playing; //whether the player is playing or not
+    private boolean player; //whether the player is playing or not
 
     private Timer timer;
     private boolean running;
 
 
-    public Snake(boolean playing) {
-        this.playing = playing;
+    public Snake(boolean player) {
+        this.player = player;
 
         initSnake();
         generateFood();
@@ -55,7 +57,9 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
             drawSquare(snake.get(i), Constants.SNAKE_BODY_COLOR, g);
         }
 
-        drawSquare(snake.get(0), Constants.SNAKE_HEAD_COLOR, g); //snake head
+        if(snake.size() > 0) {
+            drawSquare(snake.get(0), Constants.SNAKE_HEAD_COLOR, g); //snake head
+        }
     }
 
     private void drawSquare(Coordinate c, Color color, Graphics g) {
@@ -219,7 +223,7 @@ public class Snake extends JPanel implements KeyListener, ActionListener {
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode()) {
             case KeyEvent.VK_ENTER: //to start the game if manually played
-                if(playing) {
+                if(player) {
                     start();
                 }
                 break;

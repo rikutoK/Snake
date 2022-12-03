@@ -10,9 +10,11 @@ public class Individual {
     public static final int LENGTH = WEIGHT_LENGTH + BIAS_LENGTH;
 
     double[] chromosome;
+    int fitness; //score of the game
 
     public Individual() {
         chromosome = new double[LENGTH];
+        fitness = Integer.MIN_VALUE;
 
         for(int i = 0; i < WEIGHT_LENGTH; i++) {
             chromosome[i] = Math.random(); //weight from 0 to 1
@@ -23,7 +25,44 @@ public class Individual {
         }
     }
 
+    public Individual(double[] chromosome, int fitness) {
+        this.chromosome = chromosome;
+        this.fitness = fitness;
+    }
+ 
     public double get(int index) {
         return chromosome[index];
+    }
+
+    public void set(int index, double gene) {
+        chromosome[index] = gene;
+    }
+
+    public int getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(int fitness) {
+        this.fitness = fitness;
+    }
+
+    public double[] getChromosome() {
+        return chromosome;
+    }
+
+
+    public Individual clone() {
+        return new Individual(chromosome.clone(), fitness);
+    }
+
+    @Override
+    public String toString() {
+        String output = "";
+
+        for(double d : chromosome) {
+            output += d + ", ";
+        }
+
+        return output.substring(0, output.length() - 2);
     }
 }
